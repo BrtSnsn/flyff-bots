@@ -5,19 +5,21 @@ from collections import deque
 
 class ComputerVision:
     def __init__(self) -> None:
-        i = 0
+        # i = 0
         pass
-
+        
     def get_point_near_center(center, points):
-        dist_two_points = lambda center, point: ((center[0] - point[0]) ** 2 + (center[1] - point[1]) ** 2) ** (1 / 2)
+        dist_two_points = lambda center, point: ((center[0] - (point[0] + point[2] / 2)) ** 2 + (center[1] - (point[1] + point[3] / 2)) ** 2) ** (1 / 2)
         closest_dist = 999999  # Start with a big number for smaller search
         best_point = deque(maxlen=2)
         for point in points:
+            # print(point)
             dist = dist_two_points(center, point)
             # print(center, point, dist)
             if dist < closest_dist:
                 closest_dist = dist
                 best_point.append(point)
+                # print(best_point)
         # Return the second most nearest point or the nearest point if just have one point.
         # Because the nearest mob sometimes is already dead and we don't want to select it.
         # global i
@@ -63,6 +65,7 @@ class ComputerVision:
 
         # print(frame_center, frame_w, frame_h)
         # cv2.rectangle(img_copy, (0,0), frame_center, (0,255,255), 2)
+
 
         mob_pos = ComputerVision.get_point_near_center(frame_center, rectangles)
 

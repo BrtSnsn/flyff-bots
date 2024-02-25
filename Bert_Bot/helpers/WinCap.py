@@ -41,7 +41,7 @@ class imagecap:
         save_dc.SelectObject(bitmap)
 
         # If Special K is running, this number is 3. If not, 1
-        result = windll.user32.PrintWindow(self.hwnd, save_dc.GetSafeHdc(), 2)
+        result = windll.user32.PrintWindow(self.hwnd, save_dc.GetSafeHdc(), 3)
 
         bmpinfo = bitmap.GetInfo()
         bmpstr = bitmap.GetBitmapBits(True)

@@ -19,6 +19,7 @@ class Bot:
         self.imagecap = imagecap
         self.lock = Lock()
         Thread(target=self.__frame_thread, daemon=True).start()
+        sleep(1)
         Thread(target=self.__farm_thread, daemon=True).start()
         self.window = None
 
@@ -41,15 +42,18 @@ class Bot:
             try:
                 self.frame_c, self.frame = self.imagecap.capture_win_alt(self)
 
-            except:
-                print("fail on screen collection")
+            except Exception as e:
+                print(f"screen collect fail {e}")
                 pass
 
     def __get_mobs_position(self):
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mushpang.png"
         mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
+        # try:
         m, df, mobpos = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
+        # except Exception as e:
+        #     print(e)
 
         return m, df, mobpos
 
@@ -65,11 +69,10 @@ class Bot:
                     # self.lock.release()
                     self.__kill_mobs(mob_pos=mobpos)
                     pass
-                pass
             except Exception as e:
-                print(f"fail farm {i}")
-                print(e)
+                print(f"fail farm {i} {e}")
                 i += 1
+                self.__no_mobs_to_kill()
                 pass
 
 
@@ -91,12 +94,21 @@ class Bot:
                 else:
                     if (time() - fight_time) >= int(15):
                         print('fight time crosse')
+                        print(time())
+                        print(fight_time)
                         self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
                         break
                     print("sleep")
                     sleep(float(1))
                     pass
         pass
+
+    def __no_mobs_to_kill(self):
+        print("No Mobs in Area, moving.")
+        self.keyboard.human_turn_back()
+        self.keyboard.hold_key(VKEY["w"], press_time=2)
+        sleep(0.1)
+        self.keyboard.press_key(VKEY["s"])
 
     def __check_mob_existence(self):
         temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\sword.png"
