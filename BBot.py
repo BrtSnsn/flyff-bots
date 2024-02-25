@@ -31,6 +31,8 @@ class Bot:
                 cv2.imshow("vision", self.window)
             except:
                 pass
+        # while True:
+        #     pass
 
 
         pass
@@ -49,7 +51,8 @@ class Bot:
     def __get_mobs_position(self):
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mushpang.png"
-        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
+        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf.png"
         # try:
         m, df, mobpos = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
         # except Exception as e:
@@ -92,34 +95,43 @@ class Bot:
                 if not self.__check_mob_health():
                     break
                 else:
-                    if (time() - fight_time) >= int(15):
-                        print('fight time crosse')
+                    if (time() - fight_time) >= int(20):
+                        print('fight time crossed')
                         print(time())
                         print(fight_time)
-                        self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
+                        # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
+                        self.keyboard.press_key(VKEY["esc"])
                         break
-                    print("sleep")
-                    sleep(float(1))
+                    # print("sleep")
+                    # sleep(float(1))
                     pass
         pass
 
     def __no_mobs_to_kill(self):
         print("No Mobs in Area, moving.")
-        self.keyboard.human_turn_back()
-        self.keyboard.hold_key(VKEY["w"], press_time=2)
+        # self.keyboard.human_turn_back()
+        self.keyboard.hold_key(VKEY["w"], press_time=0.05)
+        self.keyboard.hold_key(VKEY["right_arrow"], press_time=0.02)
+        # self.keyboard.press_key(VKEY["w"])
+        # self.keyboard.press_key(VKEY["w"])
+        # self.keyboard.press_key(VKEY["w"])
+        # self.keyboard.press_key(VKEY["right_arrow"])
+        
         sleep(0.1)
         self.keyboard.press_key(VKEY["s"])
 
     def __check_mob_existence(self):
         temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\sword.png"
-        thresh = ComputerVision.template_match(self.frame, temp_name)
-        print("sword?",thresh)
+        thr = 0.4
+        thresh = ComputerVision.template_match(self.frame, temp_name, thr)
+        # print("sword?",thresh)
         return thresh
     
     def __check_mob_health(self):
-        temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mob_life_bar.png"
-        thresh = ComputerVision.template_match(self.frame, temp_name)
-        print("healthbar still visible?",thresh)
+        temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mob_life_bar2.png"
+        thr = 0.9
+        thresh = ComputerVision.template_match(self.frame, temp_name, thr)
+        # print("healthbar still visible?",thresh)
         return thresh
 
 

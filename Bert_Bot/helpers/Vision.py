@@ -27,7 +27,7 @@ class ComputerVision:
         #     i = -1
         # elif i == -1:
         #     i = 0
-        return best_point[0]
+        return best_point[-1]
 
     @staticmethod
     def get_all_mobs(img_c, img, mob_name_path: str):
@@ -103,11 +103,11 @@ class ComputerVision:
         return rectangles, img_copy, mob_pos
     
     @staticmethod
-    def template_match(img, image_path: str):
+    def template_match(img, image_path: str, threshold):
         template = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, _ = cv2.minMaxLoc(result)
-        threshold = 0.40
+        # threshold = 0.40
         passed_threshold = max_val >= threshold
         # print(max_val)
 

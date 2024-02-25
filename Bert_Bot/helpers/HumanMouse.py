@@ -18,7 +18,7 @@ class HumanMouse:
         self.hwnd = hwnd
         self.translator = translator
 
-    def move(self, to_point, duration=0.5, translate=True, like_robot=True):
+    def move(self, to_point, duration=0.3, translate=True, like_robot=False):
         """
         Move mouse from current mouse position to a given point, in a human way or like a robot.
         It translates the point from the game window to the screen if a translator is provided.
