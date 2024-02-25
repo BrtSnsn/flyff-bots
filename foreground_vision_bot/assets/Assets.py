@@ -13,12 +13,14 @@ mob_cetiri_electricity_path = str(Path(__file__).parent / "names" / "cetiri_elec
 mob_oseti_electricity_path = str(Path(__file__).parent / "names" / "oseti_electricity.png")
 mob_carvi_fire_path = str(Path(__file__).parent / "names" / "carvi_fire.png")
 mob_nyamuli_fire_path = str(Path(__file__).parent / "names" / "nyamuli_fire.png")
+aibat_path = str(Path(__file__).parent / "names" / "aibat.png")
 
 mob_type_wind_path = str(Path(__file__).parent / "mob_types" / "wind.png")
 mob_type_fire_path = str(Path(__file__).parent / "mob_types" / "fire.png")
 mob_type_soil_path = str(Path(__file__).parent / "mob_types" / "soil.png")
 mob_type_water_path = str(Path(__file__).parent / "mob_types" / "water.png")
 mob_type_electricity_path = str(Path(__file__).parent / "mob_types" / "electricity.png")
+mob_type_any = str(Path(__file__).parent / "mob_types" / "any.png")
 
 mob_life_bar_path = str(Path(__file__).parent / "general" / "mob_life_bar.png")
 user_target_bar_path = str(Path(__file__).parent / "general" / "user_target_bar.png")
@@ -32,9 +34,18 @@ class MobType:
     SOIL = cv.imread(mob_type_soil_path, cv.IMREAD_GRAYSCALE)
     WATER = cv.imread(mob_type_water_path, cv.IMREAD_GRAYSCALE)
     ELECTRICITY = cv.imread(mob_type_electricity_path, cv.IMREAD_GRAYSCALE)
+    ANY = cv.imread(mob_type_any, cv.IMREAD_GRAYSCALE)
 
 
 class MobInfo:
+    Aibat = {
+        "name": "aibat",
+        "element": "none",
+        "map_name": "dummy",
+        "height_offset": 80,
+        "name_img": cv.imread(aibat_path, cv.IMREAD_GRAYSCALE),
+        "element_img": MobType.ANY,
+    }
     ROSPOSA = {
         "name": "rosposa",
         "element": "water",

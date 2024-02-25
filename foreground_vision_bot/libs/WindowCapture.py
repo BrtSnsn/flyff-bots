@@ -3,7 +3,7 @@ import numpy as np
 import win32con
 import win32gui
 import win32ui
-
+from ctypes import windll
 
 class WindowCapture:
     def __init__(self, hwnd, crop_area=(8, 30, 8, 8)):
@@ -38,20 +38,30 @@ class WindowCapture:
                 The second array is the image in grayscale format, 1 channel.
         """
 
+        windll.user32.SetProcessDPIAware()
         wDC = win32gui.GetWindowDC(self.hwnd)
         dcObj = win32ui.CreateDCFromHandle(wDC)
         cDC = dcObj.CreateCompatibleDC()
         dataBitMap = win32ui.CreateBitmap()
         dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
         cDC.SelectObject(dataBitMap)
-        cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.crop_l, self.crop_t), win32con.SRCCOPY)
-        signedIntsArray = dataBitMap.GetBitmapBits(True)
-        img = np.fromstring(signedIntsArray, dtype="uint8")
-        img.shape = (self.h, self.w, 4)
-        dcObj.DeleteDC()
-        cDC.DeleteDC()
-        win32gui.ReleaseDC(self.hwnd, wDC)
-        win32gui.DeleteObject(dataBitMap.GetHandle())
+        
+        # cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.crop_l, self.crop_t), win32con.SRCCOPY)
+        # signedIntsArray = dataBitMap.GetBitmapBits(True)
+        # img = np.fromstring(signedIntsArray, dtype="uint8")
+        # img.shape = (self.h, self.w, 4)
+        # dcObj.DeleteDC()
+        # cDC.DeleteDC()
+        # win32gui.ReleaseDC(self.hwnd, wDC)
+        # win32gui.DeleteObject(dataBitMap.GetHandle())
+
+        result = windll.user32.PrintWindow(self.hwnd, cDC.GetSafeHdc(), 3)
+
+        bmpinfo = dataBitMap.GetInfo()
+        bmpstr = dataBitMap.GetBitmapBits(True)
+
+        img = np.frombuffer(bmpstr, dtype=np.uint8).reshape((bmpinfo["bmHeight"], bmpinfo["bmWidth"], 4))
+        # img = np.ascontiguousarray(img)[..., :-1]
 
         # drop the alpha channel, or cv.matchTemplate() will throw an error like:
         #   error: (-215:Assertion failed) (depth == CV_8U || depth == CV_32F) && type == _templ.type()
@@ -65,9 +75,16 @@ class WindowCapture:
         # https://github.com/opencv/opencv/issues/14866#issuecomment-580207109
         img = np.ascontiguousarray(img)
 
+        if not result:  # result should be 1
+            win32gui.DeleteObject(dataBitMap.GetHandle())
+            dcObj.DeleteDC()
+            dcObj.DeleteDC()
+            win32gui.ReleaseDC(self.hwnd, wDC)
+            raise RuntimeError(f"Unable to acquire screenshot! Result: {result}")
+
         # DEBUGGING: Show the image
-        # cv.imshow("screenshot", img)
-        # cv.waitKey(1)
+        cv.imshow("screenshot", img)
+        cv.waitKey(1)
 
         # DEBUGGING: Save the screenshot to disk
         # cv.imwrite("screenshot.png", img)

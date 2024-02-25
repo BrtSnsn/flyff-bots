@@ -329,9 +329,9 @@ class Bot:
             self.debug_frame = drawn_frame
 
         if passed_threshold:
-            # print(f"Mob found! mob_existence_match_threshold: {max_val}")
+            print(f"Mob found! mob_existence_match_threshol")
             return True
-        # print(f"No mob found! mob_existence_match_threshold: {max_val}")
+        print(f"No mob found! mob_existence_match_thres")
         return False
 
     def __check_inventory_open(self, debug=False):
