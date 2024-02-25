@@ -6,7 +6,20 @@ import win32ui
 
 class imagecap:
     def __init__(self):
-        self.window_name = "Flyff Universe - Google Chrome"
+        # self.window_name = "Flyff Universe - Google Chrome"
+
+        crop_area=(8, 30, 8, 8)
+        self.crop_l = crop_area[0]
+        self.crop_t = crop_area[1]
+        self.crop_r = crop_area[2]
+        self.crop_b = crop_area[3]
+
+        self.w = 0
+        self.h = 0
+        self.offset_x = 0
+        self.offset_y = 0
+        # self.__update_size_and_offset()
+
         pass
 
     def capture_win_alt(self):
@@ -14,13 +27,13 @@ class imagecap:
 
         # windll.user32.SetProcessDPIAware()
         window_name = "Flyff Universe - Google Chrome"
-        hwnd = win32gui.FindWindow(None, window_name)
+        self.hwnd = win32gui.FindWindow(None, window_name)
 
-        left, top, right, bottom = win32gui.GetClientRect(hwnd)
+        left, top, right, bottom = win32gui.GetClientRect(self.hwnd)
         w = right - left
         h = bottom - top
 
-        hwnd_dc = win32gui.GetWindowDC(hwnd)
+        hwnd_dc = win32gui.GetWindowDC(self.hwnd)
         mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
         save_dc = mfc_dc.CreateCompatibleDC()
         bitmap = win32ui.CreateBitmap()
@@ -28,7 +41,7 @@ class imagecap:
         save_dc.SelectObject(bitmap)
 
         # If Special K is running, this number is 3. If not, 1
-        result = windll.user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 2)
+        result = windll.user32.PrintWindow(self.hwnd, save_dc.GetSafeHdc(), 2)
 
         bmpinfo = bitmap.GetInfo()
         bmpstr = bitmap.GetBitmapBits(True)
@@ -40,7 +53,7 @@ class imagecap:
             win32gui.DeleteObject(bitmap.GetHandle())
             save_dc.DeleteDC()
             mfc_dc.DeleteDC()
-            win32gui.ReleaseDC(hwnd, hwnd_dc)
+            win32gui.ReleaseDC(self.hwnd, hwnd_dc)
             raise RuntimeError(f"Unable to acquire screenshot! Result: {result}")
         
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -57,15 +70,6 @@ class imagecap:
             cv2.imshow('Computer Vision', screenshot)
             # cv2.waitKey()
             # cv2.destroyAllWindows()
-    def get_screen_pos(self, pos):
-        """
-        Translate a pixel position on a screenshot image to a pixel position on the screen.
-
-        :param pos: tuple (x, y). Position on the screenshot image.
-        :return: tuple (x, y). Position on the screen.
-        """
-        self.__update_size_and_offset()
-        return (pos[0] + self.offset_x, pos[1] + self.offset_y)
 
     def __update_size_and_offset(self):
         """
@@ -81,6 +85,19 @@ class imagecap:
         # images into actual screen positions
         self.offset_x = left + self.crop_l
         self.offset_y = top + self.crop_t
+
+    def get_screen_pos(self, pos):
+        """
+        Translate a pixel position on a screenshot image to a pixel position on the screen.
+
+        :param pos: tuple (x, y). Position on the screenshot image.
+        :return: tuple (x, y). Position on the screen.
+        """
+        # imagecap.__update_size_and_offset(self)
+        # return (pos[0] + self.offset_x, pos[1] + self.offset_y)
+        return (pos[0], pos[1])
+
+
 
 #     def health_bar_view(self):
 #         WINDOW_NAME = "Flyff Universe - Google Chrome"

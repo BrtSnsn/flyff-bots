@@ -14,6 +14,7 @@ class ComputerVision:
         best_point = deque(maxlen=2)
         for point in points:
             dist = dist_two_points(center, point)
+            # print(center, point, dist)
             if dist < closest_dist:
                 closest_dist = dist
                 best_point.append(point)
@@ -59,6 +60,9 @@ class ComputerVision:
         frame_h = img_copy.shape[0]
         frame_center = (frame_w // 2, frame_h // 2)
 
+        print(frame_center, frame_w, frame_h)
+        cv2.rectangle(img_copy, (0,0), frame_center, (0,255,255), 2)
+
         mob_pos = ComputerVision.get_point_near_center(frame_center, rectangles)
 
         # for (x, y) in zip(mob_pos[0], mob_pos[1]):
@@ -70,6 +74,7 @@ class ComputerVision:
         #         markerSize=40,
         #         thickness=2,
         #     )
+        
 
         text = f"({mob_pos})"
         font_face = cv2.FONT_HERSHEY_DUPLEX
@@ -79,7 +84,7 @@ class ComputerVision:
         (text_w, text_h), _ = cv2.getTextSize(text, font_face, font_scale, font_thickness)
         text_offset_x = (w - text_w) // 2
         text_offset_y = text_h + 5
-        text_pos = (x + text_offset_x, y + h + text_offset_y)
+        text_pos = (mob_pos[0] + text_offset_x, mob_pos[1] + h + text_offset_y)
         cv2.putText(
             img_copy,
             text,

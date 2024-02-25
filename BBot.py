@@ -1,5 +1,5 @@
 
-from threading import Thread
+from threading import Thread, Lock
 
 from Bert_Bot.helpers.WinCap import imagecap
 from Bert_Bot.helpers.Vision import ComputerVision
@@ -16,6 +16,7 @@ https://github.com/ClarityCoders/ComputerVision-OpenCV/blob/master/Lesson3-Templ
 class Bot:
     def __init__(self) -> None:
         self.imagecap = imagecap
+        self.lock = Lock()
         Thread(target=self.__frame_thread, daemon=True).start()
         Thread(target=self.__farm_thread, daemon=True).start()
         self.window = None
@@ -50,20 +51,31 @@ class Bot:
         return m, df, mobpos
 
     def __farm_thread(self):
+        i = 0
         while True:
             try:
                 matches, df, mobpos = self.__get_mobs_position()
                 self.window = df
-                if matches:
-                    self.__kill_mobs(self, mobpos=mobpos)
+                if len(matches) > 0:
+                    self.lock.acquire()
+                    print(mobpos)
+                    self.lock.release()
+                    self.__kill_mobs(mob_pos=mobpos)
                     pass
                 pass
-            except:
+            except Exception as e:
+                print(f"fail farm {i}")
+                print(e)
+                i += 1
                 pass
 
 
-    def __kill_mobs(self, mobpos):
-
+    def __kill_mobs(self, mob_pos):
+        # self.lock.acquire()
+        # print("h")
+        self.mouse.move(to_point=mob_pos, duration=0.1)
+        # self.mouse.left_click()
+        # self.lock.release()
         pass
 
 
