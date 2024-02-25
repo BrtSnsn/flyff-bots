@@ -79,25 +79,35 @@ class Bot:
         # self.lock.release()
         self.mouse.move(to_point=mob_pos, duration=0.1)
         if self.__check_mob_existence():
-            self.lock.acquire()
-            print("hh")
-            self.lock.release()
+            # self.lock.acquire()
+            # print("hh")
+            # self.lock.release()
             self.mouse.left_click()
             self.keyboard.hold_key(VKEY["F1"], press_time=0.06)
             fight_time = time()
             while True:
-                if time() - fight_time >= int(5):
-                    print("time out")
+                if not self.__check_mob_health():
                     break
                 else:
+                    if (time() - fight_time) >= int(15):
+                        print('fight time crosse')
+                        self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
+                        break
                     print("sleep")
-                    sleep(float(5))
+                    sleep(float(1))
+                    pass
         pass
 
     def __check_mob_existence(self):
         temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\sword.png"
         thresh = ComputerVision.template_match(self.frame, temp_name)
-        print(thresh)
+        print("sword?",thresh)
+        return thresh
+    
+    def __check_mob_health(self):
+        temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mob_life_bar.png"
+        thresh = ComputerVision.template_match(self.frame, temp_name)
+        print("healthbar still visible?",thresh)
         return thresh
 
 
