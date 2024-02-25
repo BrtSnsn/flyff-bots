@@ -4,9 +4,10 @@ from threading import Thread, Lock
 from Bert_Bot.helpers.WinCap import imagecap
 from Bert_Bot.helpers.Vision import ComputerVision
 import cv2
+from time import sleep, time
 
 from Bert_Bot.helpers.HumanMouse import HumanMouse
-from Bert_Bot.helpers.HumanKeyboard import HumanKeyboard
+from Bert_Bot.helpers.HumanKeyboard import HumanKeyboard, VKEY
 
 """
 https://github.com/ClarityCoders/fishington.io-bot/blob/main/main/bot.py
@@ -45,7 +46,9 @@ class Bot:
                 pass
 
     def __get_mobs_position(self):
-        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mushpang.png"
+        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
         m, df, mobpos = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
 
         return m, df, mobpos
@@ -57,9 +60,9 @@ class Bot:
                 matches, df, mobpos = self.__get_mobs_position()
                 self.window = df
                 if len(matches) > 0:
-                    self.lock.acquire()
-                    print(mobpos)
-                    self.lock.release()
+                    # self.lock.acquire()
+                    # print(mobpos)
+                    # self.lock.release()
                     self.__kill_mobs(mob_pos=mobpos)
                     pass
                 pass
@@ -73,10 +76,29 @@ class Bot:
     def __kill_mobs(self, mob_pos):
         # self.lock.acquire()
         # print("h")
-        self.mouse.move(to_point=mob_pos, duration=0.1)
-        # self.mouse.left_click()
         # self.lock.release()
+        self.mouse.move(to_point=mob_pos, duration=0.1)
+        if self.__check_mob_existence():
+            self.lock.acquire()
+            print("hh")
+            self.lock.release()
+            self.mouse.left_click()
+            self.keyboard.hold_key(VKEY["F1"], press_time=0.06)
+            fight_time = time()
+            while True:
+                if time() - fight_time >= int(5):
+                    print("time out")
+                    break
+                else:
+                    print("sleep")
+                    sleep(float(5))
         pass
+
+    def __check_mob_existence(self):
+        temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\sword.png"
+        thresh = ComputerVision.template_match(self.frame, temp_name)
+        print(thresh)
+        return thresh
 
 
 

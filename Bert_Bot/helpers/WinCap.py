@@ -94,8 +94,16 @@ class imagecap:
         :return: tuple (x, y). Position on the screen.
         """
         # imagecap.__update_size_and_offset(self)
-        # return (pos[0] + self.offset_x, pos[1] + self.offset_y)
-        return (pos[0], pos[1])
+        # return (pos[0] + sel
+        # f.offset_x, pos[1] + se
+        # lf.offset_y)
+
+        # middle of the rectangle
+        x = pos[0] + (pos[2] // 2)
+        y = pos[1] + (pos[3] // 2)
+
+        # return (pos[0], pos[1])  # aibat offset
+        return x, y + 20
 
 
 
