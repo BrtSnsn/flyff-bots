@@ -5,7 +5,8 @@ from Bert_Bot.helpers.WinCap import imagecap
 from Bert_Bot.helpers.Vision import ComputerVision
 import cv2
 
-# from foreground_vision_bot.libs.human_mouse.HumanMouse import HumanMouse
+from Bert_Bot.helpers.HumanMouse import HumanMouse
+from Bert_Bot.helpers.HumanKeyboard import HumanKeyboard
 
 """
 https://github.com/ClarityCoders/fishington.io-bot/blob/main/main/bot.py
@@ -18,6 +19,9 @@ class Bot:
         Thread(target=self.__frame_thread, daemon=True).start()
         Thread(target=self.__farm_thread, daemon=True).start()
         self.window = None
+
+        self.mouse = HumanMouse(self.imagecap.get_screen_pos)
+        self.keyboard = HumanKeyboard()
 
         while cv2.waitKey(1) != ord('q'):
             try:
@@ -50,15 +54,15 @@ class Bot:
             try:
                 matches, df, mobpos = self.__get_mobs_position()
                 self.window = df
-                # if matches:
-                #     self.__kill_mobs(self, points=matches, window=df)
-                #     pass
+                if matches:
+                    self.__kill_mobs(self, mobpos=mobpos)
+                    pass
                 pass
             except:
                 pass
 
 
-    def __kill_mobs(self, points, window):
+    def __kill_mobs(self, mobpos):
 
         pass
 
