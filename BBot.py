@@ -26,7 +26,7 @@ class Bot:
         self.frame = None
         self.th_existence = False
         self.th_health = False
-        self.window = self.frame_c
+        # self.window = self.frame_c
 
         self.cursor_all = deque(maxlen=2)
         self.cursor_all.append(0)
@@ -36,7 +36,7 @@ class Bot:
 
         capture_thread = Thread(target=self.__frame_thread, daemon=True)
         process_thread = Thread(target=self.__farm_thread, daemon=True)
-        # existence_thread = Thread(target=self.__check_mob_existence, daemon=True)
+        existence_thread = Thread(target=self.__check_mob_existence, daemon=True)
         health_thread = Thread(target=self.__check_mob_health, daemon=True)
 
         self.mouse = HumanMouse(self.imagecap.get_screen_pos)
@@ -44,7 +44,7 @@ class Bot:
 
         capture_thread.start()
         process_thread.start()
-        # existence_thread.start()
+        existence_thread.start()
         health_thread.start()
 
 
@@ -82,19 +82,25 @@ class Bot:
             try:
                 matches, df, mobpos1, mobpos2 = self.__get_mobs_position()
                 self.window = df
+                
+                # print(matches)
+                # print(mobpos1,mobpos2)
                 if len(matches) > 0:
                     # self.lock.acquire()
                     # print(mobpos)
                     # self.lock.release()
                     # print(mobpos1)
                     # print(type(mobpos2))
-                    if self.kill_count % 2 == 0 and not np.all(mobpos1 == 0):
-                        # print("The value is even.")
-                        # print(np.all(mobpos1 == 0))
-                        self.__kill_mobs(mob_pos=mobpos1)
-                    elif np.all(mobpos2 == 0):
-                        # print("The value is uneven.")
+                    if self.kill_count % 2 == 0 and not np.all(mobpos2 == 0):
                         self.__kill_mobs(mob_pos=mobpos2)
+                    elif self.kill_count % 2 == 0 and not np.all(mobpos1 == 0):
+                        self.__kill_mobs(mob_pos=mobpos1)
+                    elif self.kill_count % 2 != 0 and not np.all(mobpos1 == 0):
+                        self.__kill_mobs(mob_pos=mobpos2)
+                    elif self.kill_count % 2 != 0 and not np.all(mobpos2 == 0):
+                        self.__kill_mobs(mob_pos=mobpos1)
+                    else:
+                        pass
 
             except Exception as e:
                 print(f"fail farm {i} {e}")
@@ -107,32 +113,35 @@ class Bot:
         # self.lock.acquire()
         # print("h")
         # self.lock.release()
-        # self.mouse.move(to_point=mob_pos, duration=0.1)
-        th_exist = self.__check_mob_existence()
-        print(th_exist)
-        if th_exist:
+        self.mouse.move(to_point=mob_pos, duration=0.001)
+        # th_exist = self.__check_mob_existence()
+        # print(th_exist)
+        # if th_exist:
+        # print(self.th_health)
         # print(self.th_existence)
-        # if self.th_existence:
+        if self.th_existence:
             # self.lock.acquire()
             # print(mob_pos)
             # self.lock.release()
             self.mouse.left_click()
-            # self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
-            # fight_time = time()
-            # while True:
-            #     if not self.th_health():
-            #         break
-            #     else:
-            #         if (time() - fight_time) >= int(20):
-            #             print('fight time crossed')
-            #             print(time())
-            #             print(fight_time)
-            #             # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
-            #             self.keyboard.press_key(VKEY["esc"])
-            #             break
-            #         # print("sleep")
-            #         # sleep(float(1))
-            #         pass
+            self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
+            fight_time = time()
+            while True:
+                if not self.th_health:
+                    self.kill_count += 1
+                    print(self.kill_count)
+                    break
+                else:
+                    if (time() - fight_time) >= int(20):
+                        print('fight time crossed')
+                        print(time())
+                        print(fight_time)
+                        # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
+                        self.keyboard.press_key(VKEY["esc"])
+                        break
+                    # print("sleep")
+                    # sleep(float(1))
+                    pass
         pass
 
     def __no_mobs_to_kill(self):
@@ -149,23 +158,15 @@ class Bot:
         self.keyboard.press_key(VKEY["s"])
 
     def __check_mob_existence(self):
-        thresh = False
-        try:
-            cursor_info = win32gui.GetCursorInfo()[1]
-            
-            self.cursor_all.append(cursor_info)
-            if self.cursor_all[0] != self.cursor_all[1]:
-                thresh = True
+        while True:
+            cur1 = win32gui.GetCursorInfo()[1]
+            sleep(0.1)
+            cur2 = win32gui.GetCursorInfo()[1]
+            if cur1 != cur2:
+                self.th_existence = True
             else:
-                thresh = False
-        except Exception as e:
-            print(e)
-            thresh = False
+                self.th_existence = False
 
-        # self.th_existence = thresh
-        print("mob still visible?",thresh)
-        return thresh
-        # self.th_existence = win32gui.GetCursorInfo()[1] != win32gui.GetCursorInfo()[1]
 
     
     def __check_mob_health(self):

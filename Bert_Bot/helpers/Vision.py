@@ -80,15 +80,18 @@ class ComputerVision:
 
         # x = mob_pos[0] + (mob_pos[2] // 2)
         # y = mob_pos[1] + (mob_pos[3] // 2)
-        text = f"({mob_pos1})"
+        # text = f"({mob_pos1})"
         font_face = cv2.FONT_HERSHEY_DUPLEX
-        font_scale = 0.35
+        font_scale = 5
         font_color = (0, 0, 200)
-        font_thickness = 1
+        font_thickness = 3
         # (text_w, text_h), _ = cv2.getTextSize(text, font_face, font_scale, font_thickness)
         # text_offset_x = (w - text_w) // 2
         # text_offset_y = text_h + 5
+        i = 0
         for each in [mob_pos1, mob_pos2]:
+            text = str(i)
+            i+=1
             x = each[0] + (each[2] // 2)
             y = each[1] + (each[3] // 2)
             text_pos = (x, y)
@@ -113,8 +116,9 @@ class ComputerVision:
     
     @staticmethod
     def template_match(img, image_path: str, threshold):
+        img_crop = img[151:190, 583:611]
         template = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-        result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
+        result = cv2.matchTemplate(img_crop, template, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, _ = cv2.minMaxLoc(result)
         # threshold = 0.40
         passed_threshold = max_val >= threshold
