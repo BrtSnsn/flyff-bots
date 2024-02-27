@@ -6,8 +6,6 @@ import win32ui
 
 class imagecap:
     def __init__(self):
-        # self.window_name = "Flyff Universe - Google Chrome"
-
         crop_area=(8, 30, 8, 8)
         self.crop_l = crop_area[0]
         self.crop_t = crop_area[1]
@@ -23,9 +21,12 @@ class imagecap:
         pass
 
     def capture_win_alt(self):
+        """
+        Returns a screenshot of the active window.
+        """
         # Adapted from https://stackoverflow.com/questions/19695214/screenshot-of-inactive-window-printwindow-win32gui
 
-        # windll.user32.SetProcessDPIAware()
+        windll.user32.SetProcessDPIAware() 
         window_name = "Flyff Universe - Google Chrome"
         self.hwnd = win32gui.FindWindow(None, window_name)
 
@@ -103,63 +104,4 @@ class imagecap:
         y = pos[1] + (pos[3] // 2)
 
         # return (pos[0], pos[1])  # aibat offset
-        return x - 10, y + 20
-
-
-
-#     def health_bar_view(self):
-#         WINDOW_NAME = "Flyff Universe - Google Chrome"
-#         health_bar_image = cv2.imread("C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\mob_life_bar.png", cv2.IMREAD_GRAYSCALE)
-        
-#         while cv2.waitKey(1) != ord('q'):
-#             img_c, img = imagecap().capture_win_alt()
-#             img_copy = np.copy(img_c)
-#             # cv2.imshow('Computer Vision', img)
-#             result = cv2.matchTemplate(img, health_bar_image, cv2.TM_CCOEFF_NORMED)
-#             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-#             w = health_bar_image.shape[1]
-#             h = health_bar_image.shape[0]
-
-#             cv2.rectangle(img_copy, max_loc, (max_loc[0] + w, max_loc[1] + h), (0,255,255), 2)
-#             cv2.imshow("vision", img_copy)
-#         pass
-
-# def main():
-#     WINDOW_NAME = "Flyff Universe - Google Chrome"
-#     mob_name = cv2.imread("C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png", cv2.IMREAD_GRAYSCALE)
-    
-#     while cv2.waitKey(1) != ord('q'):
-#         img_c, img = imagecap().capture_win_alt()
-#         img_copy = np.copy(img_c)
-#         # cv2.imshow('Computer Vision', img)
-#         result = cv2.matchTemplate(img, mob_name, cv2.TM_CCOEFF_NORMED)
-#         # cv2.imshow("vision", result)
-#         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-#         w = mob_name.shape[1]
-#         h = mob_name.shape[0]
-
-#         # cv2.rectangle(img_copy, max_loc, (max_loc[0] + w, max_loc[1] + h), (0,255,255), 2)
-#         # cv2.imshow("vision", img_copy)
-
-#         threshold = 0.75
-#         yloc, xloc = np.where(result >= threshold)
-
-#         rectangles = []
-#         for (x, y) in zip(xloc, yloc):
-#             rectangles.append([int(x), int(y), int(w), int(h)])
-#             rectangles.append([int(x), int(y), int(w), int(h)])
-
-#         rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
-
-#         for (x, y, w, h) in rectangles:
-#             cv2.rectangle(img_copy, (x, y), (x + w, y + h), (0,255,255), 2)
-        
-#         cv2.imshow("vision", img_copy)
-        
-#     pass
-
-# if __name__ == '__main__':
-
-#     imagecap().debug_window()
-#     # imagecap().health_bar_view()
-#     # main()
+        return x, y

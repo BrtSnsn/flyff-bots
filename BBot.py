@@ -5,6 +5,9 @@ from Bert_Bot.helpers.WinCap import imagecap
 from Bert_Bot.helpers.Vision import ComputerVision
 import cv2
 from time import sleep, time
+import win32gui
+from collections import deque
+import numpy as np
 
 from Bert_Bot.helpers.HumanMouse import HumanMouse
 from Bert_Bot.helpers.HumanKeyboard import HumanKeyboard, VKEY
@@ -18,29 +21,43 @@ class Bot:
     def __init__(self) -> None:
         self.imagecap = imagecap
         self.lock = Lock()
-        Thread(target=self.__frame_thread, daemon=True).start()
-        sleep(1)
-        Thread(target=self.__farm_thread, daemon=True).start()
-        self.window = None
+
+        self.frame_c = None
+        self.frame = None
+        self.th_existence = False
+        self.th_health = False
+        self.window = self.frame_c
+
+        self.cursor_all = deque(maxlen=2)
+        self.cursor_all.append(0)
+        self.cursor_all.append(0)
+
+        self.kill_count = 0
+
+        capture_thread = Thread(target=self.__frame_thread, daemon=True)
+        process_thread = Thread(target=self.__farm_thread, daemon=True)
+        # existence_thread = Thread(target=self.__check_mob_existence, daemon=True)
+        health_thread = Thread(target=self.__check_mob_health, daemon=True)
 
         self.mouse = HumanMouse(self.imagecap.get_screen_pos)
         self.keyboard = HumanKeyboard()
+
+        capture_thread.start()
+        process_thread.start()
+        # existence_thread.start()
+        health_thread.start()
+
 
         while cv2.waitKey(1) != ord('q'):
             try:
                 cv2.imshow("vision", self.window)
             except:
                 pass
-        # while True:
-        #     pass
-
-
         pass
 
 
     def __frame_thread(self):
         while True:
-        # while cv2.waitKey(1) != ord('q'):
             try:
                 self.frame_c, self.frame = self.imagecap.capture_win_alt(self)
 
@@ -53,29 +70,36 @@ class Bot:
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mushpang.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
         mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf.png"
-        # try:
-        m, df, mobpos = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
-        # except Exception as e:
+        m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
         #     print(e)
 
-        return m, df, mobpos
+        return m, df, mobpos1, mobpos2
+
 
     def __farm_thread(self):
         i = 0
         while True:
             try:
-                matches, df, mobpos = self.__get_mobs_position()
+                matches, df, mobpos1, mobpos2 = self.__get_mobs_position()
                 self.window = df
                 if len(matches) > 0:
                     # self.lock.acquire()
                     # print(mobpos)
                     # self.lock.release()
-                    self.__kill_mobs(mob_pos=mobpos)
-                    pass
+                    # print(mobpos1)
+                    # print(type(mobpos2))
+                    if self.kill_count % 2 == 0 and not np.all(mobpos1 == 0):
+                        # print("The value is even.")
+                        # print(np.all(mobpos1 == 0))
+                        self.__kill_mobs(mob_pos=mobpos1)
+                    elif np.all(mobpos2 == 0):
+                        # print("The value is uneven.")
+                        self.__kill_mobs(mob_pos=mobpos2)
+
             except Exception as e:
                 print(f"fail farm {i} {e}")
                 i += 1
-                self.__no_mobs_to_kill()
+                # self.__no_mobs_to_kill()
                 pass
 
 
@@ -83,28 +107,32 @@ class Bot:
         # self.lock.acquire()
         # print("h")
         # self.lock.release()
-        self.mouse.move(to_point=mob_pos, duration=0.1)
-        if self.__check_mob_existence():
+        # self.mouse.move(to_point=mob_pos, duration=0.1)
+        th_exist = self.__check_mob_existence()
+        print(th_exist)
+        if th_exist:
+        # print(self.th_existence)
+        # if self.th_existence:
             # self.lock.acquire()
-            # print("hh")
+            # print(mob_pos)
             # self.lock.release()
             self.mouse.left_click()
-            self.keyboard.hold_key(VKEY["F1"], press_time=0.06)
-            fight_time = time()
-            while True:
-                if not self.__check_mob_health():
-                    break
-                else:
-                    if (time() - fight_time) >= int(20):
-                        print('fight time crossed')
-                        print(time())
-                        print(fight_time)
-                        # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
-                        self.keyboard.press_key(VKEY["esc"])
-                        break
-                    # print("sleep")
-                    # sleep(float(1))
-                    pass
+            # self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
+            # fight_time = time()
+            # while True:
+            #     if not self.th_health():
+            #         break
+            #     else:
+            #         if (time() - fight_time) >= int(20):
+            #             print('fight time crossed')
+            #             print(time())
+            #             print(fight_time)
+            #             # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
+            #             self.keyboard.press_key(VKEY["esc"])
+            #             break
+            #         # print("sleep")
+            #         # sleep(float(1))
+            #         pass
         pass
 
     def __no_mobs_to_kill(self):
@@ -121,18 +149,36 @@ class Bot:
         self.keyboard.press_key(VKEY["s"])
 
     def __check_mob_existence(self):
-        temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\sword.png"
-        thr = 0.4
-        thresh = ComputerVision.template_match(self.frame, temp_name, thr)
-        # print("sword?",thresh)
+        thresh = False
+        try:
+            cursor_info = win32gui.GetCursorInfo()[1]
+            
+            self.cursor_all.append(cursor_info)
+            if self.cursor_all[0] != self.cursor_all[1]:
+                thresh = True
+            else:
+                thresh = False
+        except Exception as e:
+            print(e)
+            thresh = False
+
+        # self.th_existence = thresh
+        print("mob still visible?",thresh)
         return thresh
+        # self.th_existence = win32gui.GetCursorInfo()[1] != win32gui.GetCursorInfo()[1]
+
     
     def __check_mob_health(self):
         temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mob_life_bar2.png"
         thr = 0.9
-        thresh = ComputerVision.template_match(self.frame, temp_name, thr)
+        try:
+            thresh = ComputerVision.template_match(self.frame, temp_name, thr)
+        except Exception as e:
+            print(e)
+            thresh = False
         # print("healthbar still visible?",thresh)
-        return thresh
+        self.th_health = thresh
+        # return thresh
 
 
 
