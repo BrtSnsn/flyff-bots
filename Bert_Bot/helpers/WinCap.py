@@ -104,4 +104,4 @@ class imagecap:
         y = pos[1] + (pos[3] // 2)
 
         # return (pos[0], pos[1])  # aibat offset
-        return x, y
+        return x, y + 30  # flyff offset

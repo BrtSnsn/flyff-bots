@@ -28,6 +28,12 @@ class Bot:
         self.th_health = False
         # self.window = self.frame_c
 
+        self.matches = None
+        self.window = None
+        self.mobpos1 = None
+        self.mobpos2 = None
+
+
         self.cursor_all = deque(maxlen=2)
         self.cursor_all.append(0)
         self.cursor_all.append(0)
@@ -38,6 +44,7 @@ class Bot:
         process_thread = Thread(target=self.__farm_thread, daemon=True)
         existence_thread = Thread(target=self.__check_mob_existence, daemon=True)
         health_thread = Thread(target=self.__check_mob_health, daemon=True)
+        imageprocesssing_thread = Thread(target=self.__get_mobs_position, daemon=True)
 
         self.mouse = HumanMouse(self.imagecap.get_screen_pos)
         self.keyboard = HumanKeyboard()
@@ -46,6 +53,7 @@ class Bot:
         process_thread.start()
         existence_thread.start()
         health_thread.start()
+        imageprocesssing_thread.start()
 
 
         while cv2.waitKey(1) != ord('q'):
@@ -69,36 +77,45 @@ class Bot:
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mushpang.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
-        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf.png"
-        m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
-        #     print(e)
+        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf2.png"
+        while True:
+            try:
+                m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
 
-        return m, df, mobpos1, mobpos2
+                self.matches = m
+                self.window = df
+                self.mobpos1 = mobpos1
+                self.mobpos2 = mobpos2
+            except Exception as e:
+                print(f"fail get mobs position {e}")
+                pass
+
+        # return m, df, mobpos1, mobpos2
 
 
     def __farm_thread(self):
         i = 0
         while True:
             try:
-                matches, df, mobpos1, mobpos2 = self.__get_mobs_position()
-                self.window = df
+                # matches, df, mobpos1, mobpos2 = self.__get_mobs_position()
+                # self.window = df
                 
                 # print(matches)
                 # print(mobpos1,mobpos2)
-                if len(matches) > 0:
+                if len(self.matches) > 0:
                     # self.lock.acquire()
                     # print(mobpos)
                     # self.lock.release()
                     # print(mobpos1)
                     # print(type(mobpos2))
-                    if self.kill_count % 2 == 0 and not np.all(mobpos2 == 0):
-                        self.__kill_mobs(mob_pos=mobpos2)
-                    elif self.kill_count % 2 == 0 and not np.all(mobpos1 == 0):
-                        self.__kill_mobs(mob_pos=mobpos1)
-                    elif self.kill_count % 2 != 0 and not np.all(mobpos1 == 0):
-                        self.__kill_mobs(mob_pos=mobpos2)
-                    elif self.kill_count % 2 != 0 and not np.all(mobpos2 == 0):
-                        self.__kill_mobs(mob_pos=mobpos1)
+                    if self.kill_count % 2 == 0 and not np.all(self.mobpos2 == 0):
+                        self.__kill_mobs(mob_pos=self.mobpos2)
+                    elif self.kill_count % 2 == 0 and not np.all(self.mobpos1 == 0):
+                        self.__kill_mobs(mob_pos=self.mobpos1)
+                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos1 == 0):
+                        self.__kill_mobs(mob_pos=self.mobpos2)
+                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos2 == 0):
+                        self.__kill_mobs(mob_pos=self.mobpos1)
                     else:
                         pass
 
@@ -110,38 +127,40 @@ class Bot:
 
 
     def __kill_mobs(self, mob_pos):
+        i = 0
         # self.lock.acquire()
         # print("h")
         # self.lock.release()
-        self.mouse.move(to_point=mob_pos, duration=0.001)
+        self.mouse.move(to_point=mob_pos, duration=0)
         # th_exist = self.__check_mob_existence()
         # print(th_exist)
         # if th_exist:
         # print(self.th_health)
         # print(self.th_existence)
         if self.th_existence:
-            # self.lock.acquire()
-            # print(mob_pos)
-            # self.lock.release()
-            self.mouse.left_click()
-            self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
-            fight_time = time()
-            while True:
-                if not self.th_health:
-                    self.kill_count += 1
-                    print(self.kill_count)
-                    break
-                else:
-                    if (time() - fight_time) >= int(20):
-                        print('fight time crossed')
-                        print(time())
-                        print(fight_time)
-                        # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
-                        self.keyboard.press_key(VKEY["esc"])
-                        break
-                    # print("sleep")
-                    # sleep(float(1))
-                    pass
+            self.lock.acquire()
+            print("click", i)
+            i += 1
+            self.lock.release()
+            # self.mouse.left_click()
+            # self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
+            # fight_time = time()
+            # while True:
+            #     if not self.th_health:
+            #         self.kill_count += 1
+            #         print(self.kill_count)
+            #         break
+            #     else:
+            #         if (time() - fight_time) >= int(20):
+            #             print('fight time crossed')
+            #             print(time())
+            #             print(fight_time)
+            #             # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
+            #             self.keyboard.press_key(VKEY["esc"])
+            #             break
+            #         # print("sleep")
+            #         # sleep(float(1))
+            #         pass
         pass
 
     def __no_mobs_to_kill(self):
