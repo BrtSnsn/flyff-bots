@@ -23,6 +23,9 @@ class imagecap:
     def capture_win_alt(self):
         """
         Returns a screenshot of the active window.
+
+        https://stackoverflow.com/questions/69425612/createcompatibledc-or-deletedc-fail-in-continues-loop-in-python-possible-m
+         If chrome is the window, you should just screenshot your whole screen and use that.
         """
         # Adapted from https://stackoverflow.com/questions/19695214/screenshot-of-inactive-window-printwindow-win32gui
 
@@ -60,6 +63,8 @@ class imagecap:
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         return img, img_gray
+
+
 
 
     def debug_window(self):

@@ -67,7 +67,8 @@ class ComputerVision:
             
         frame_w = img_copy.shape[1]
         frame_h = img_copy.shape[0]
-        frame_center = (frame_w // 2, frame_h // 3 * 2)
+        frame_center = (frame_w, frame_h)
+        # frame_center = (frame_w // 2, frame_h // 3 * 2)
 
         # print(frame_center, frame_w, frame_h)
         # cv2.rectangle(img_copy, (0,0), frame_center, (0,255,255), 2)
@@ -115,16 +116,19 @@ class ComputerVision:
         return rectangles, img_copy, mob_pos1, mob_pos2
     
     @staticmethod
-    def template_match(img, image_path: str, threshold):
-        img_crop = img[151:190, 583:611]
+    def template_match(img, image_path: str, threshold, h1, h2, w1, w2):
+        # img_crop = img[150:190, 540:660]
+        img_crop = img[h1:h2, w1:w2]
+        # img_crop = img
         template = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         result = cv2.matchTemplate(img_crop, template, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, _ = cv2.minMaxLoc(result)
-        # threshold = 0.40
+        # _, max_val, _, _ = cv2.minMaxLoc(result)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         passed_threshold = max_val >= threshold
-        # print(max_val)
 
-        # print(passed_threshold)
+        w = template.shape[1]
+        h = template.shape[0]
 
+        cv2.rectangle(img_crop, max_loc, (max_loc[0] + w, max_loc[1] + h), (0,255,255), 2)
 
-        return passed_threshold
+        return passed_threshold, max_val, img_crop, result
