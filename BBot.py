@@ -27,6 +27,7 @@ class Bot:
         self.frame = None
         self.th_existence = False
         self.th_health = False
+        self.player_health = False
         # self.window = self.frame_c
 
         self.matches = None
@@ -45,7 +46,8 @@ class Bot:
         capture_thread = Thread(target=self.__frame_thread, daemon=True)
         process_thread = Thread(target=self.__farm_thread, daemon=True)
         existence_thread = Thread(target=self.__check_mob_existence, daemon=True)
-        health_thread = Thread(target=self.__check_mob_health, daemon=True)
+        mob_health_thread = Thread(target=self.__check_mob_health, daemon=True)
+        player_health_thread = Thread(target=self.__check_player_health, daemon=True)
         imageprocesssing_thread = Thread(target=self.__get_mobs_position, daemon=True)
 
         self.mouse = HumanMouse(self.imagecap.get_screen_pos)
@@ -54,14 +56,15 @@ class Bot:
         capture_thread.start()
         process_thread.start()
         existence_thread.start()
-        health_thread.start()
+        mob_health_thread.start()
+        player_health_thread.start()
         imageprocesssing_thread.start()
 
 
         while cv2.waitKey(1) != ord('q'):
             try:
                 cv2.imshow("vision", self.window)
-                # cv2.imshow("vision2", self.window2)
+                cv2.imshow("vision2", self.window2)
                 pass
             except Exception as e:
                 print(e)
@@ -71,14 +74,6 @@ class Bot:
 
 
     def __frame_thread(self):
-        # while True:
-        #     try:
-        #         self.frame_c, self.frame = self.imagecap.capture_win_alt(self)
-
-        #     except Exception as e:
-        #         print(f"screen collect fail {e}")
-        #         pass
-
         hdesktop = win32gui.GetDesktopWindow()
         (l, r, w, h) = win32gui.GetClientRect(hdesktop)
         hdc = win32gui.GetWindowDC(hdesktop)
@@ -100,7 +95,9 @@ class Bot:
                 window_name = "Flyff Universe - Google Chrome"
                 hwnd = win32gui.FindWindow(None, window_name)
 
-                
+                left, top, right, bottom = win32gui.GetClientRect(hwnd)
+                w = right - left
+                h = bottom - top
 
                 # If Special K is running, this number is 3. If not, 1
                 result = windll.user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 3)
@@ -110,6 +107,8 @@ class Bot:
 
                 img = np.frombuffer(bmpstr, dtype=np.uint8).reshape((bmpinfo["bmHeight"], bmpinfo["bmWidth"], 4))
                 self.frame_c = np.ascontiguousarray(img)[..., :3]  # make image C_CONTIGUOUS and drop alpha channel
+                self.frame_c = self.frame_c[top:bottom, left:right]
+
 
                 if not result:  # result should be 1
                     win32gui.DeleteObject(bitmap.GetHandle())
@@ -118,7 +117,7 @@ class Bot:
                     win32gui.ReleaseDC(hwnd, hdesktop)
                     raise RuntimeError(f"Unable to acquire screenshot! Result: {result}")
                 
-                self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)[top:bottom, left:right]
             
             except Exception as e:
                 print(f"screen collect fail {e}")
@@ -131,7 +130,8 @@ class Bot:
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mushpang.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
-        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf2.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\bang.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\bossbang.png"
         mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf3.png"
         while True:
             try:
@@ -175,11 +175,24 @@ class Bot:
                         self.__kill_mobs(mob_pos=self.mobpos2)
                     else:
                         pass
+                else:
+                    pass
 
             except Exception as e:
                 print(f"fail farm {i} {e}")
                 i += 1
                 # self.__no_mobs_to_kill()
+                self.mouse.move(to_point=(479, 250, 0, 0), duration=0)
+                self.mouse.drag_right_click(to_point=(499, 250, 0, 0), duration=0)
+                # sleep(0.1)
+                # self.mouse.left_click()
+                # sleep(0.1)
+                # self.keyboard.hold_key(VKEY["right_arrow"], press_time=0.02)
+                # sleep(0.1)
+                # self.keyboard.press_key(VKEY["left_arrow"])
+                # sleep(0.1)
+                # self.keyboard.press_key(VKEY["s"])
+                # print("moved")
                 pass
 
 
@@ -193,6 +206,7 @@ class Bot:
         # print("h")
         # self.lock.release()
         if self.th_health:
+            """failsafe voor als loop onderaan gebroken wordt"""
             # fight still going on
             pass
         else:
@@ -210,7 +224,7 @@ class Bot:
                 else:
                     fight_time = time()
                     while True:
-                        print(self.th_health)
+                        # print(self.player_health)
                         if not self.th_health:
                             self.kill_count += 1
                             print(self.kill_count)
@@ -221,43 +235,33 @@ class Bot:
                             self.keyboard.hold_key(VKEY["numpad_2"], press_time=0.06)
                             break
                         elif self.th_health and (time() - fight_time) >= int(3):
-                            print("pressing 1")
+                            print("pressing 1", self.th_health)
                             self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
                             fight_time = time()
+                        elif self.player_health:
+                            print("healing, pressing 3", self.player_health)
+                            self.keyboard.hold_key(VKEY["numpad_3"], press_time=0.06)
                         else:
                             pass
-                    # while True:
-                    pass
-                
-                    #     if not self.th_health:
-                    #         self.kill_count += 1
-                    #         print(self.kill_count)
-                    #         break
-                    #     else:
-                    #         if (time() - fight_time) >= int(20):
-                    #             print('fight time crossed')
-                    #             print(time())
-                    #             print(fight_time)
-                    #             # self.keyboard.hold_key(VKEY["esc"], press_time=0.06)
-                    #             self.keyboard.press_key(VKEY["esc"])
-                    #             break
-                    #         # print("sleep")
-                    #         # sleep(float(1))
-                    #         pass
+            else:
+                # self.keyboard.hold_key(VKEY["right_arrow"], press_time=0.02)
+                # self.keyboard.press_key(VKEY["right_arrow"])
+                pass
         pass
 
     def __no_mobs_to_kill(self):
+        """width 958 pixels"""
         print("No Mobs in Area, moving.")
-        # self.keyboard.human_turn_back()
-        self.keyboard.hold_key(VKEY["w"], press_time=0.05)
+        self.mouse.move(to_point=(479, 250, 0, 0), duration=0)
+        sleep(0.1)
+        self.mouse.left_click()
+        sleep(0.1)
         self.keyboard.hold_key(VKEY["right_arrow"], press_time=0.02)
-        # self.keyboard.press_key(VKEY["w"])
-        # self.keyboard.press_key(VKEY["w"])
-        # self.keyboard.press_key(VKEY["w"])
-        # self.keyboard.press_key(VKEY["right_arrow"])
-        
+        sleep(0.1)
+        self.keyboard.press_key(VKEY["left_arrow"])
         sleep(0.1)
         self.keyboard.press_key(VKEY["s"])
+        print("moved")
 
     def __check_mob_existence(self):
         while True:
@@ -280,7 +284,7 @@ class Bot:
         while True:
             try:
                 thresh, _, df, _ = ComputerVision.template_match(self.frame, temp_name, thr, h1=150, h2=190, w1=540, w2=660)
-                self.window2 = df
+                # self.window2 = df
                 self.th_health = thresh
             except Exception as e:
                 print('fail check mob health', e)
@@ -291,16 +295,16 @@ class Bot:
         description: This function checks if the mob is still alive by checking the health bar.
         
         """
-        temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\player_health.png"
-        thr = 0.95
+        thr = 50
         while True:
             try:
-                thresh, _, df, _ = ComputerVision.template_match(self.frame, temp_name, thr)
+                tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=159, h2=169, w1=110, w2=210)
                 self.window2 = df
-                self.th_health = thresh
+                self.player_health = tr
+                # print(tr)
             except Exception as e:
-                print('fail check mob health', e)
-                self.th_health = False
+                print('fail check player health', e)
+                self.player_health = False
 
 
 

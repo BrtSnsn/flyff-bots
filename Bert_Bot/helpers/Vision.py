@@ -18,10 +18,11 @@ class ComputerVision:
         # best_point[0] = None
         # print(best_point)
         # best_point[1] = None
+        # i = 0
+        # print("start")
         for point in points:
-            # print(point)
             dist = dist_two_points(center, point)
-            # print(center, point, dist)
+            # print(dist, closest_dist, point)
             if dist < closest_dist:
                 closest_dist = dist
                 best_point.append(point)
@@ -33,6 +34,7 @@ class ComputerVision:
         #     i = -1
         # elif i == -1:
         #     i = 0
+        # print("Done", best_point[0], best_point[1])
         return best_point[0], best_point[1]
 
     @staticmethod
@@ -50,7 +52,7 @@ class ComputerVision:
         # cv2.rectangle(img_copy, max_loc, (max_loc[0] + w, max_loc[1] + h), (0,255,255), 2)
         # cv2.imshow("vision", img_copy)
 
-        threshold = 0.75
+        threshold = 0.80
         yloc, xloc = np.where(result >= threshold)
 
         rectangles = []
@@ -67,11 +69,11 @@ class ComputerVision:
             
         frame_w = img_copy.shape[1]
         frame_h = img_copy.shape[0]
-        frame_center = (frame_w, frame_h)
-        # frame_center = (frame_w // 2, frame_h // 3 * 2)
+        # frame_center = (frame_w/2, frame_h/)
+        frame_center = (frame_w // 2, frame_h // 3 * 2)
 
         # print(frame_center, frame_w, frame_h)
-        # cv2.rectangle(img_copy, (0,0), frame_center, (0,255,255), 2)
+        cv2.rectangle(img_copy, (0,0), frame_center, (0,255,255), 2)
 
 
         mob_pos1, mob_pos2 = ComputerVision.get_point_near_center(frame_center, rectangles)
@@ -132,3 +134,28 @@ class ComputerVision:
         cv2.rectangle(img_crop, max_loc, (max_loc[0] + w, max_loc[1] + h), (0,255,255), 2)
 
         return passed_threshold, max_val, img_crop, result
+    
+    def contour_compare(img, threshold, h1, h2, w1, w2):
+        """
+        dit moet wel pixel perfect zijn dus begin maar de kijken met pyautogui.mouseInfo()
+        """
+        thresh = False
+
+        image = img[h1:h2, w1:w2]
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)[1]
+        contours, hierarchy = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        largest_contour = max(contours, key=cv2.contourArea)
+        area = cv2.contourArea(largest_contour)
+        # max is 900
+        threshold = 400
+        # print(threshold, area)
+        if area < threshold:
+            # print("The healthbar has dropped below the limit.")
+            thresh = True
+        else:
+            # print("The healthbar is still above the limit.")
+            thresh = False
+            pass
+        
+        return thresh, image
