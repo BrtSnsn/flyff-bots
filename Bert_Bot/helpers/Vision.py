@@ -69,8 +69,8 @@ class ComputerVision:
             
         frame_w = img_copy.shape[1]
         frame_h = img_copy.shape[0]
-        # frame_center = (frame_w/2, frame_h/)
-        frame_center = (frame_w // 2, frame_h // 6 * 5)
+        frame_center = (frame_w // 2, frame_h// 3 * 2)
+        # frame_center = (frame_w // 2, frame_h // 6 * 5)
 
         # print(frame_center, frame_w, frame_h)
         cv2.rectangle(img_copy, (0,0), frame_center, (0,255,255), 2)
@@ -148,7 +148,7 @@ class ComputerVision:
         largest_contour = max(contours, key=cv2.contourArea)
         area = cv2.contourArea(largest_contour)
         # max is 900
-        threshold = 400
+        threshold = 300
         # print(threshold, area)
         if area < threshold:
             # print("The healthbar has dropped below the limit.")

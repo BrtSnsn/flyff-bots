@@ -127,7 +127,7 @@ class Bot:
 
 
     def __get_mobs_position(self):
-        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\aibat.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mushpang.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\bang.png"
@@ -135,7 +135,8 @@ class Bot:
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf3.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\FLYBAT.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\small_mia.png"
-        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_mantis.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_mantis.png"
+        mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_man.png"
         th = 0.80
         while True:
             try:
@@ -165,20 +166,22 @@ class Bot:
                     # self.lock.acquire()
                     # print(mobpos)
                     # self.lock.release()
-                    if self.kill_count % 2 == 0 and not np.all(self.mobpos2 == 0):
-                        # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                    # if self.kill_count % 2 == 0 and not np.all(self.mobpos2 == 0):
+                    #     # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                    #     self.__kill_mobs(mob_pos=self.mobpos2)
+                    # elif self.kill_count % 2 == 0 and not np.all(self.mobpos1 == 0):
+                    #     # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                    #     self.__kill_mobs(mob_pos=self.mobpos1)
+                    # elif self.kill_count % 2 != 0 and not np.all(self.mobpos1 == 0):
+                    #     # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                    #     self.__kill_mobs(mob_pos=self.mobpos1)
+                    # elif self.kill_count % 2 != 0 and not np.all(self.mobpos2 == 0):
+                    #     # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                    #     self.__kill_mobs(mob_pos=self.mobpos2)
+
+                    # dit werkt
+                    if not np.all(self.mobpos2 == 0):
                         self.__kill_mobs(mob_pos=self.mobpos2)
-                    elif self.kill_count % 2 == 0 and not np.all(self.mobpos1 == 0):
-                        # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
-                        self.__kill_mobs(mob_pos=self.mobpos1)
-                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos1 == 0):
-                        # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
-                        self.__kill_mobs(mob_pos=self.mobpos1)
-                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos2 == 0):
-                        # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
-                        self.__kill_mobs(mob_pos=self.mobpos2)
-                    else:
-                        pass
                 else:
                     pass
 
@@ -264,8 +267,9 @@ class Bot:
                         elif self.th_health and (time() - start) >= int(30):
                             print("timeout, moving")
                             # self.keyboard.press_key(VKEY["esc"])
-                            self.keyboard.hold_key(VKEY["d"], press_time=0.06)
-                            self.keyboard.hold_key(VKEY["s"], press_time=0.06)
+                            self.keyboard.hold_key(VKEY["d"], press_time=0.1)
+                            # self.keyboard.hold_key(VKEY["s"], press_time=0.06)
+                            start = time()
 
                         else:
                             pass
@@ -305,11 +309,13 @@ class Bot:
         description: This function checks if the mob is still alive by checking the health bar.
         
         """
-        temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mob_life_bar2.png"
+        # temp_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\mob_life_bar2.png"
+        temp_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\mob_life_bar2.png"
         thr = 0.75
         while True:
             try:
-                thresh, _, df, _ = ComputerVision.template_match(self.frame, temp_name, thr, h1=150, h2=190, w1=540, w2=660)
+                # thresh, _, df, _ = ComputerVision.template_match(self.frame, temp_name, thr, h1=150, h2=190, w1=540, w2=660)
+                thresh, _, df, _ = ComputerVision.template_match(self.frame, temp_name, thr, h1=100, h2=160, w1=740, w2=800)
                 # self.window2 = df
                 self.th_health = thresh
             except Exception as e:
@@ -324,7 +330,8 @@ class Bot:
         thr = 50
         while True:
             try:
-                tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=159, h2=169, w1=110, w2=210)
+                # tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=159, h2=169, w1=110, w2=210)
+                tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=125, h2=133, w1=125, w2=224)
                 self.window2 = df
                 self.player_health = tr
                 # print(tr)
