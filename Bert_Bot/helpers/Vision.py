@@ -38,7 +38,7 @@ class ComputerVision:
         return best_point[0], best_point[1]
 
     @staticmethod
-    def get_all_mobs(img_c, img, mob_name_path: str):
+    def get_all_mobs(img_c, img, mob_name_path: str, th):
         # img_c, img = imagecap().capture_win_alt()
         mob_name = cv2.imread(mob_name_path, cv2.IMREAD_GRAYSCALE)
         img_copy = np.copy(img_c)
@@ -52,8 +52,8 @@ class ComputerVision:
         # cv2.rectangle(img_copy, max_loc, (max_loc[0] + w, max_loc[1] + h), (0,255,255), 2)
         # cv2.imshow("vision", img_copy)
 
-        threshold = 0.80
-        yloc, xloc = np.where(result >= threshold)
+        # threshold = 0.80
+        yloc, xloc = np.where(result >= th)
 
         rectangles = []
         for (x, y) in zip(xloc, yloc):
@@ -70,7 +70,7 @@ class ComputerVision:
         frame_w = img_copy.shape[1]
         frame_h = img_copy.shape[0]
         # frame_center = (frame_w/2, frame_h/)
-        frame_center = (frame_w // 2, frame_h // 3 * 2)
+        frame_center = (frame_w // 2, frame_h // 6 * 5)
 
         # print(frame_center, frame_w, frame_h)
         cv2.rectangle(img_copy, (0,0), frame_center, (0,255,255), 2)

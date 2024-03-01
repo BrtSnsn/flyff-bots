@@ -132,10 +132,14 @@ class Bot:
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\fefern.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\bang.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\bossbang.png"
-        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf3.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf3.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\FLYBAT.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\small_mia.png"
+        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_mantis.png"
+        th = 0.80
         while True:
             try:
-                m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name)
+                m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name, th=th)
 
                 self.matches = m
                 self.window = df
@@ -182,8 +186,9 @@ class Bot:
                 print(f"fail farm {i} {e}")
                 i += 1
                 # self.__no_mobs_to_kill()
-                self.mouse.move(to_point=(479, 250, 0, 0), duration=0)
-                self.mouse.drag_right_click(to_point=(499, 250, 0, 0), duration=0)
+                # self.mouse.move(to_point=(479, 250, 0, 0), duration=0)
+                # sleep(0.1)
+                # self.mouse.drag_right_click(to_point=(499, 250, 0, 0), duration=0)
                 # sleep(0.1)
                 # self.mouse.left_click()
                 # sleep(0.1)
@@ -210,19 +215,34 @@ class Bot:
             # fight still going on
             pass
         else:
-            self.mouse.move(to_point=mob_pos, duration=0)
+            # x, y = mob_pos
+            # print(mob_pos)
+            x = mob_pos[0] + (mob_pos[2] // 2)
+            y = mob_pos[1] + (mob_pos[3] // 2)
+
+            self.mouse.move(to_point=(x, y, 0, 0), duration=0)  # normal mob
+            sleep(0.1)
+            # self.mouse.move(to_point=(x, y), duration=0)  # captain mob
+            # if not self.th_existence:
+            #     self.mouse.move(to_point=(x-20, y, 0, 0), duration=0)  # other name mob
+            #     sleep(0.1)
+
             if self.th_existence:
                 # self.lock.acquire()
                 # self.lock.release()
                 self.mouse.left_click()
+                # self.keyboard.press_key(VKEY["numpad_4"])
+                self.keyboard.hold_key(VKEY["numpad_4"], press_time=0.03)
+                sleep(0.1)  # give time to the healtbar detection thread to return a positive
                 self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
-                sleep(0.5)  # give time to the healtbar detection thread to return a positive
+                sleep(0.2)  # give time to the healtbar detection thread to return a positive
 
                 if not self.th_health:
                     self.keyboard.hold_key(VKEY["s"], press_time=0.06)
                     print("reset")
                 else:
                     fight_time = time()
+                    start = time()
                     while True:
                         # print(self.player_health)
                         if not self.th_health:
@@ -241,6 +261,12 @@ class Bot:
                         elif self.player_health:
                             print("healing, pressing 3", self.player_health)
                             self.keyboard.hold_key(VKEY["numpad_3"], press_time=0.06)
+                        elif self.th_health and (time() - start) >= int(30):
+                            print("timeout, moving")
+                            # self.keyboard.press_key(VKEY["esc"])
+                            self.keyboard.hold_key(VKEY["d"], press_time=0.06)
+                            self.keyboard.hold_key(VKEY["s"], press_time=0.06)
+
                         else:
                             pass
             else:
