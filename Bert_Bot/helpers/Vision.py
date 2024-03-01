@@ -118,9 +118,14 @@ class ComputerVision:
         return rectangles, img_copy, mob_pos1, mob_pos2
     
     @staticmethod
-    def template_match(img, image_path: str, threshold, h1, h2, w1, w2):
+    def template_match(img, image_path: str, threshold, h1 = False, h2 = None, w1 = None, w2 = None):     
+        if not h1:
+            img_crop = img
+        else:
+            img_crop = img[h1:h2, w1:w2]
+        
         # img_crop = img[150:190, 540:660]
-        img_crop = img[h1:h2, w1:w2]
+        # img_crop = img[h1:h2, w1:w2]
         # img_crop = img
         template = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         result = cv2.matchTemplate(img_crop, template, cv2.TM_CCOEFF_NORMED)
@@ -133,15 +138,16 @@ class ComputerVision:
 
         cv2.rectangle(img_crop, max_loc, (max_loc[0] + w, max_loc[1] + h), (0,255,255), 2)
 
-        return passed_threshold, max_val, img_crop, result
+        point = (max_loc[0] + w / 2, max_loc[1] + h / 2)
+
+        return passed_threshold, max_val, img_crop, result, point
     
     def contour_compare(img, threshold, h1, h2, w1, w2):
         """
         dit moet wel pixel perfect zijn dus begin maar de kijken met pyautogui.mouseInfo()
         """
         thresh = False
-
-        image = img[h1:h2, w1:w2]
+        image = img[h1:h2, w1:w2]   
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         image = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)[1]
         contours, hierarchy = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
