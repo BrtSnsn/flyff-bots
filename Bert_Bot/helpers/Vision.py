@@ -43,6 +43,7 @@ class ComputerVision:
         mob_name = cv2.imread(mob_name_path, cv2.IMREAD_GRAYSCALE)
         img_copy = np.copy(img_c)
         # cv2.imshow('Computer Vision', img)
+        # result = cv2.matchTemplate(img, mob_name, cv2.TM_CCOEFF_NORMED)
         result = cv2.matchTemplate(img, mob_name, cv2.TM_CCOEFF_NORMED)
         # cv2.imshow("vision", result)
         # min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -53,7 +54,8 @@ class ComputerVision:
         # cv2.imshow("vision", img_copy)
 
         # threshold = 0.80
-        yloc, xloc = np.where(result >= th)
+        yloc, xloc = np.where(result >= th)  # ccoeff normad
+        # yloc, xloc = np.where(result <= th)  # squared
 
         rectangles = []
         for (x, y) in zip(xloc, yloc):

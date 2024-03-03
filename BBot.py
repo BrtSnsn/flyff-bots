@@ -68,6 +68,7 @@ class Bot:
             try:
                 cv2.imshow("vision", self.window)
                 cv2.imshow("vision2", self.window2)
+                cv2.imshow("vision3", self.window3)
                 pass
             except Exception as e:
                 print(e)
@@ -139,7 +140,12 @@ class Bot:
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\FLYBAT.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\small_mia.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_mantis.png"
-        mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_man.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_man.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\giggle.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\giggle2.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\rock_muscle2.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\cardpuppet.png"
+        mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\maid.png"
         th = 0.80
         while True:
             try:
@@ -224,6 +230,7 @@ class Bot:
             # fight still going on
             pass
         else:
+            # timer = time()
             # x, y = mob_pos
             # print(mob_pos)
             x = mob_pos[0] + (mob_pos[2] // 2)
@@ -273,13 +280,10 @@ class Bot:
                         elif self.th_health and (time() - start) >= int(30):
                             print("timeout, moving")
                             # self.keyboard.press_key(VKEY["esc"])
-                            self.keyboard.hold_key(VKEY["d"], press_time=0.1)
-                            self.keyboard.hold_key(VKEY["d"], press_time=0.1)
-                            self.keyboard.hold_key(VKEY["d"], press_time=0.1)
-                            self.keyboard.hold_key(VKEY["d"], press_time=0.1)
-                            self.keyboard.hold_key(VKEY["d"], press_time=0.1)
+                            self.keyboard.hold_key(VKEY["d"], press_time=1.2)
+
                             # self.keyboard.hold_key(VKEY["s"], press_time=0.06)
-                            start = time()
+                            start = time() - 10
                         # elif not self.aggro == None:
                         #     print("aggro detected", print(self.aggro))
                         #     pass
@@ -328,7 +332,7 @@ class Bot:
             try:
                 # thresh, _, df, _, _ = ComputerVision.template_match(self.frame, temp_name, thr, h1=150, h2=190, w1=540, w2=660)
                 thresh, _, df, _, _ = ComputerVision.template_match(self.frame, temp_name, thr, h1=100, h2=160, w1=740, w2=800)
-                # self.window2 = df
+                self.window2 = df
                 self.th_health = thresh
             except Exception as e:
                 print('fail check mob health', e)
@@ -343,7 +347,7 @@ class Bot:
             try:
                 # tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=159, h2=169, w1=110, w2=210)
                 tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=125, h2=133, w1=125, w2=224)
-                self.window2 = df
+                self.window3 = df
                 self.player_health = tr
                 # print(tr)
             except Exception as e:
