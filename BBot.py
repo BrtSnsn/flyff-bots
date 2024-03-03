@@ -146,11 +146,11 @@ class Bot:
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\rock_muscle2.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\cardpuppet.png"
         mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\maid.png"
-        th = 0.60
+        th = 0.80
         while True:
             try:
-                # m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name, th=th)
-                m, df, mobpos1, mobpos2 = ComputerVision.get_all_red_mobs(self.frame_c, self.frame, mob_name, th=th)
+                m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name, th=th)
+                # m, df, mobpos1, mobpos2 = ComputerVision.get_all_red_mobs(self.frame_c, self.frame, mob_name, th=th)
 
                 self.matches = m
                 self.window = df
@@ -182,12 +182,12 @@ class Bot:
                     elif self.kill_count % 2 == 0 and not np.all(self.mobpos1 == 0):
                         # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
                         self.__kill_mobs(mob_pos=self.mobpos1)
-                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos1 == 0):
-                        # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
-                        self.__kill_mobs(mob_pos=self.mobpos1)
                     elif self.kill_count % 2 != 0 and not np.all(self.mobpos2 == 0):
-                        # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                        # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
                         self.__kill_mobs(mob_pos=self.mobpos2)
+                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos1 == 0):
+                        # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                        self.__kill_mobs(mob_pos=self.mobpos1)
 
                     # if np.all(self.mobpos1 == 0) and not np.all(self.mobpos2 == 0):
                     #     self.__no_mobs_to_kill(mob_pos=self.mobpos2)
@@ -292,7 +292,9 @@ class Bot:
                             pass
             else:
                 # self.keyboard.hold_key(VKEY["right_arrow"], press_time=0.02)
-                # self.keyboard.press_key(VKEY["right_arrow"])
+                # self.keyboard.press_key(VKEY["e"])
+                # sleep(0.1)
+                # self.keyboard.press_key(VKEY["e"])
                 pass
         pass
 
@@ -313,7 +315,7 @@ class Bot:
     def __check_mob_existence(self):
         while True:
             cur1 = win32gui.GetCursorInfo()[1]
-            sleep(0.1)
+            sleep(0.2)
             cur2 = win32gui.GetCursorInfo()[1]
             if cur1 != cur2:
                 self.th_existence = True

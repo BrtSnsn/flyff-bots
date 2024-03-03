@@ -8,7 +8,8 @@ image = cv2.imread(r"C:\Users\Brtsnsn\PycharmProjects\flyff-bots\Bert_Bot\maid_c
 
 #--- performs Otsu threshold ---
 def threshold(img, st):
-    ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    # ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    ret, thresh = cv2.threshold(img, 250, 255, cv2.THRESH_BINARY)
     cv2.imwrite(os.path.join(r"C:\Users\Brtsnsn\Desktop\New folder\\", 'res_' + str(st) + '.jpg'), thresh) 
     return  thresh
 
