@@ -156,7 +156,7 @@ class ComputerVision:
         largest_contour = max(contours, key=cv2.contourArea)
         area = cv2.contourArea(largest_contour)
         # max is 900
-        threshold = 300
+        threshold = 400
         # print(threshold, area)
         if area < threshold:
             # print("The healthbar has dropped below the limit.")
@@ -167,3 +167,81 @@ class ComputerVision:
             pass
         
         return thresh, image
+
+
+    
+    @staticmethod
+    def get_all_red_mobs(img_c, img, mob_name_path: str, th):       
+        mob_name = cv2.imread(mob_name_path)
+        img_copy = np.copy(img_c)
+        
+        def threshold(img, st):
+            ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+            return  thresh
+
+        # m1 = threshold(mob_name[:,:,0], 1)   #--- threshold on blue channel
+        # m2 = threshold(mob_name[:,:,1], 2)   #--- threshold on green channel
+        m3 = threshold(mob_name[:,:,2], 3)   #--- threshold on red channel
+        mob_name = m3
+
+        m1 = threshold(img_c[:,:,0], 1)   #--- threshold on blue channel
+        m2 = threshold(img_c[:,:,1], 2)   #--- threshold on green channel
+        m3 = threshold(img_c[:,:,2], 3)   #--- threshold on red channel
+        img_c = cv2.add(m1, cv2.add(m2, m3))
+
+        result = cv2.matchTemplate(img_c, mob_name, cv2.TM_CCOEFF_NORMED)
+
+        w = mob_name.shape[1]
+        h = mob_name.shape[0]
+
+        yloc, xloc = np.where(result >= th)  # ccoeff normad
+
+        rectangles = []
+        for (x, y) in zip(xloc, yloc):
+            rectangles.append([int(x), int(y), int(w), int(h)])
+            rectangles.append([int(x), int(y), int(w), int(h)])
+
+        rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
+
+        for (x, y, w, h) in rectangles:
+            cv2.rectangle(img_c, (x, y), (x + w, y + h), (255,255,255), 2)
+
+        frame_w = img_c.shape[1]
+        frame_h = img_c.shape[0]
+        frame_center = (frame_w // 2, frame_h// 3 * 2)
+
+        cv2.rectangle(img_c, (0,0), frame_center, (255,255,255), 2)
+
+        mob_pos1, mob_pos2 = ComputerVision.get_point_near_center(frame_center, rectangles)
+
+        font_face = cv2.FONT_HERSHEY_DUPLEX
+        font_scale = 2
+        font_color = (0, 0, 200)
+        font_thickness = 3
+
+        i = 0
+        for each in [mob_pos1, mob_pos2]:
+            text = str(i)
+            i+=1
+            x = each[0] + (each[2] // 2)
+            y = each[1] + (each[3] // 2)
+            text_pos = (x, y)
+            cv2.putText(
+                img_c,
+                text,
+                text_pos,
+                font_face,
+                font_scale,
+                font_color,
+                font_thickness,
+            )
+            cv2.drawMarker(
+                img_c,
+                text_pos,
+                color=(0,0,200),
+                markerType=cv2.MARKER_CROSS,
+                markerSize=40,
+                thickness=2,
+            )
+        # return rectangles, img_copy, mob_pos1, mob_pos2
+        return rectangles, img_c, mob_pos1, mob_pos2

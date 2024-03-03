@@ -146,10 +146,11 @@ class Bot:
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\rock_muscle2.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\cardpuppet.png"
         mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\maid.png"
-        th = 0.80
+        th = 0.60
         while True:
             try:
-                m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name, th=th)
+                # m, df, mobpos1, mobpos2 = ComputerVision.get_all_mobs(self.frame_c, self.frame, mob_name, th=th)
+                m, df, mobpos1, mobpos2 = ComputerVision.get_all_red_mobs(self.frame_c, self.frame, mob_name, th=th)
 
                 self.matches = m
                 self.window = df
