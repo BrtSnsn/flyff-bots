@@ -37,8 +37,9 @@ img = cv2.imread(r"C:\Users\Brtsnsn\PycharmProjects\flyff-bots\Bert_Bot\maid_com
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 
-
-
+"""
+https://stackoverflow.com/questions/50765729/opencv-grayscale-ignore-red-color
+"""
 #--- performs Otsu threshold ---
 def threshold(img, st):
     ret, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
