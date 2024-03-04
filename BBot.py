@@ -145,7 +145,9 @@ class Bot:
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\giggle2.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\rock_muscle2.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\cardpuppet.png"
-        mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\maid.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\maid.png"
+        mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\tomb.png"
+        # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\man_card.png"
         th = 0.80
         while True:
             try:
