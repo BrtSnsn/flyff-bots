@@ -156,7 +156,7 @@ class ComputerVision:
         largest_contour = max(contours, key=cv2.contourArea)
         area = cv2.contourArea(largest_contour)
         # max is 900
-        threshold = 400
+        threshold = 500
         # print(threshold, area)
         if area < threshold:
             # print("The healthbar has dropped below the limit.")

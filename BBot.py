@@ -49,6 +49,7 @@ class Bot:
         existence_thread = Thread(target=self.__check_mob_existence, daemon=True)
         mob_health_thread = Thread(target=self.__check_mob_health, daemon=True)
         player_health_thread = Thread(target=self.__check_player_health, daemon=True)
+        player_mp_thread = Thread(target=self.__check_player_mp, daemon=True)
         imageprocesssing_thread = Thread(target=self.__get_mobs_position, daemon=True)
         # aggro_thread = Thread(target=self.__aggro_detector, daemon=True)
 
@@ -61,6 +62,7 @@ class Bot:
         mob_health_thread.start()
         player_health_thread.start()
         imageprocesssing_thread.start()
+        player_mp_thread.start()
         # aggro_thread.start()
 
 
@@ -137,15 +139,16 @@ class Bot:
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\bang.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\bossbang.png"
         # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\lawolf3.png"
-        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\FLYBAT.png"
-        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\small_mia.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\s_wag.png"
+        mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\s_mia.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_mantis.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\red_man.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\giggle.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\giggle2.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\rock_muscle2.png"
         # mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\cardpuppet.png"
-        mob_name = r"C:\\Users\\Brtsnsn\\PycharmProjects\\flyff-bots\\Bert_Bot\\maid.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\demian.png"
+        # mob_name = r"C:\\Users\\bsa\\PycharmProjects\\flyff-bots\\Bert_Bot\\g_lawolf.png"
         th = 0.80
         while True:
             try:
@@ -182,15 +185,18 @@ class Bot:
                     elif self.kill_count % 2 == 0 and not np.all(self.mobpos1 == 0):
                         # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
                         self.__kill_mobs(mob_pos=self.mobpos1)
-                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos2 == 0):
-                        # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
-                        self.__kill_mobs(mob_pos=self.mobpos2)
                     elif self.kill_count % 2 != 0 and not np.all(self.mobpos1 == 0):
-                        # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                        # print("kill far", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
                         self.__kill_mobs(mob_pos=self.mobpos1)
+                    elif self.kill_count % 2 != 0 and not np.all(self.mobpos2 == 0):
+                        # print("kill close", self.kill_count, "mobpos1", self.mobpos1, "mobpos2", self.mobpos2)
+                        self.__kill_mobs(mob_pos=self.mobpos2)
 
-                    # if np.all(self.mobpos1 == 0) and not np.all(self.mobpos2 == 0):
-                    #     self.__no_mobs_to_kill(mob_pos=self.mobpos2)
+                    # if not np.all(self.mobpos1 == 0):
+                    #     self.__kill_mobs(mob_pos=self.mobpos1)
+                    # else:
+                    #     self.__kill_mobs(mob_pos=self.mobpos2)
+
 
                     # dit werkt
                     # if not np.all(self.mobpos2 == 0):
@@ -237,6 +243,10 @@ class Bot:
             x = mob_pos[0] + (mob_pos[2] // 2)
             y = mob_pos[1] + (mob_pos[3] // 2)
 
+            if self.player_health:
+                print("healing, pressing 3", self.player_health)
+                self.keyboard.hold_key(VKEY["numpad_3"], press_time=0.06)
+
             self.mouse.move(to_point=(x, y, 0, 0), duration=0)  # normal mob
             sleep(0.1)
             # self.mouse.move(to_point=(x, y), duration=0)  # captain mob
@@ -251,7 +261,7 @@ class Bot:
                 # self.keyboard.press_key(VKEY["numpad_4"])
                 self.keyboard.hold_key(VKEY["numpad_4"], press_time=0.03)
                 sleep(0.1)  # give time to the healtbar detection thread to return a positive
-                self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
+                # self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
                 sleep(0.2)  # give time to the healtbar detection thread to return a positive
 
                 if not self.th_health:
@@ -273,11 +283,16 @@ class Bot:
                             break
                         elif self.th_health and (time() - fight_time) >= int(3):
                             print("pressing 1", self.th_health)
+                            self.keyboard.hold_key(VKEY["numpad_4"], press_time=0.03)
+                            sleep(0.1)
                             self.keyboard.hold_key(VKEY["numpad_1"], press_time=0.06)
                             fight_time = time()
                         elif self.player_health:
                             print("healing, pressing 3", self.player_health)
                             self.keyboard.hold_key(VKEY["numpad_3"], press_time=0.06)
+                        elif self.player_mp:
+                            print("mp, pressing 4", self.player_mp)
+                            self.keyboard.hold_key(VKEY["numpad_5"], press_time=0.06)
                         elif self.th_health and (time() - start) >= int(30):
                             print("timeout, moving")
                             # self.keyboard.press_key(VKEY["esc"])
@@ -350,12 +365,28 @@ class Bot:
             try:
                 # tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=159, h2=169, w1=110, w2=210)
                 tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=125, h2=133, w1=125, w2=224)
-                self.window3 = df
+                # self.window3 = df
                 self.player_health = tr
                 # print(tr)
             except Exception as e:
                 print('fail check player health', e)
                 self.player_health = False
+    
+    def __check_player_mp(self):
+        """
+        description: This function checks if the player is still alive by checking the health bar.
+        """
+        thr = 50
+        while True:
+            try:
+                # tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=175, h2=185, w1=110, w2=210)
+                tr, df = ComputerVision.contour_compare(self.frame_c, thr, h1=125, h2=133, w1=125, w2=224)
+                self.window3 = df
+                self.player_mp = tr
+                # print(tr)
+            except Exception as e:
+                print('fail check player health', e)
+                self.player_mp = False
     
     # def __aggro_detector(self):
     #     """
